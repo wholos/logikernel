@@ -1,4 +1,7 @@
 volatile unsigned char *vimem=(volatile unsigned char*)0xb8000;
+#define VGA_WIDTH 80
+static unsigned int row=0;
+static unsigned int col=0;
 __attribute__((section(".multiboot"))) 
 unsigned int multiboot_header[] = {
     0x1BADB002,
@@ -15,16 +18,23 @@ int clearsc(){
     j=0;
 }
 int echo(const char *str){
-    unsigned int i=0,j=0;
-    while(str[j]!='\0'){
-        vimem[i]=str[j];
-        vimem[i+1]=0x07;
-        ++j;
-        i+=2;
+    while(*str){
+        if(*str=='\n'){
+            col=0;
+            row++;
+        }
+        else {
+            unsigned int i=(row*VGA_WIDTH+col)*2;
+            vimem[i]=*str;
+            vimem[i+1]=0x07;
+            col++;
+        }
+        str++;
     }
 }
 int kernelm(){
     clearsc();
-    echo("hi");
+    echo("Copyright(c) Holos(Nikita Shyshatskyi)\n");
+    echo("This is a learning system. With love, Logi.\n");
     for(;;);
 }
