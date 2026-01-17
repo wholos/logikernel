@@ -1,2 +1,0 @@
-# logikernel
-mini kernel
